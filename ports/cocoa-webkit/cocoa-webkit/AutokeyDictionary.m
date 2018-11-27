@@ -27,6 +27,10 @@
     return elementKey;
 }
 
+- (NSString *) nextAvailableKey {
+    return [@(([self elementCount] + 1)) stringValue];
+}
+
 - (NSUInteger)count {
     return [_dict count];
 }

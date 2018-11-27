@@ -27,6 +27,7 @@
 (defclass remote-interface ()
   ((host :accessor host :initform "localhost")
    (active-connection :accessor active-connection :initform nil)
+   (active-window :accessor active-window :initform nil)
    (port :accessor port :initform 8082)
    (url :accessor url :initform "/RPC2")
    (windows :accessor windows :initform (make-hash-table :test #'equal))
@@ -34,8 +35,9 @@
 
 (defmethod start-interface ((interface remote-interface))
   "Start the XML RPC Server."
-  (setf (active-connection interface)
-        (s-xml-rpc:start-xml-rpc-server :port 8081)))
+  (unless (active-connection interface)
+    (setf (active-connection interface)
+          (s-xml-rpc:start-xml-rpc-server :port 8081))))
 
 (defmethod kill-interface ((interface remote-interface))
   "Kill the XML RPC Server."
@@ -188,11 +190,17 @@
     (when (equal 0 (length (alexandria:hash-table-values windows)))
       (uiop:quit))))
 
+(defun window-did-focus (window-id)
+  (let ((window (gethash window-id (windows *interface*))))
+    (setf (active-window *interface*) window)))
+
 (import 'buffer-did-commit-navigation :s-xml-rpc-exports)
 (import 'push-key-chord :s-xml-rpc-exports)
+(import 'consume-key-sequence :s-xml-rpc-exports)
 (import 'buffer-javascript-call-back :s-xml-rpc-exports)
 (import 'minibuffer-javascript-call-back :s-xml-rpc-exports)
 (import 'window-will-close :s-xml-rpc-exports)
+(import 'window-did-focus :s-xml-rpc-exports)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Convenience methods and functions for Users of the API ;;

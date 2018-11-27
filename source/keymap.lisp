@@ -32,9 +32,20 @@
                     :modifiers (when (listp modifiers)
                                  (sort modifiers #'string-lessp)))))
     (push key-chord *key-chord-stack*))
-  (if (consume-key-sequence) 1 0))
+  (consume-key-sequence-p))
 
-(defun consume-key-sequence ()
+(defun consume-key-sequence-p ()
+  (let* ((key-maps (list *global-map*
+		         (keymap (mode
+                                  (active-buffer
+                                   (active-window
+                                    *interface*)))))))
+    (dolist (map key-maps)
+      (when (gethash *key-chord-stack* map)
+        (return-from consume-key-sequence-p 1))))
+  0)
+
+(defun consume-key-sequence (consumed?)
   ;; Iterate through all keymaps
   ;; If key recognized, execute function
   (let ((key-maps (list *global-map*

@@ -16,6 +16,7 @@
 - (NSString *) insertElement:(NSObject *) object;
 - (void) removeObjectForKey:(id) aKey;
 - (NSArray *) allKeys;
+- (NSString *) nextAvailableKey;
 
 @property (nonatomic, readwrite) NSInteger elementCount;
 
