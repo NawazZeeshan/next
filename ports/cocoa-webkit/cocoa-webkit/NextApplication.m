@@ -11,12 +11,15 @@
 #include <xmlrpc-c/client.h>
 #include <xmlrpc-c/config.h>
 #include "Global.h"
+#include "NextApplicationDelegate.h"
 
 @implementation NextApplication
 
 - (void)sendEvent:(NSEvent *)event
 {
     if ([event type] == NSEventTypeKeyDown) {
+        NextApplicationDelegate *delegate = [NSApp delegate];
+        NSString *sendingWindowId = [delegate windowActive];
         NSEventModifierFlags modifierFlags = [event modifierFlags];
         NSString* characters = [event charactersIgnoringModifiers];
         short keyCode = [event keyCode];
@@ -57,20 +60,22 @@
         };
         
         // Make the remote procedure call
-        resultP = xmlrpc_client_call(&env, "http://localhost:8081/RPC2", "PUSH-KEY-CHORD",
-                                     "(isA)",
+        resultP = xmlrpc_client_call(&env, "http://localhost:8081/RPC2", "PUSH-KEY-EVENT",
+                                     "(isAs)",
                                      (xmlrpc_int) keyCode,
                                      [characters UTF8String],
-                                     modifiers);
+                                     modifiers,
+                                     [sendingWindowId UTF8String]);
         xmlrpc_read_int(&env, resultP, &consumed);
-
         xmlrpc_DECREF(modifiers);
         xmlrpc_DECREF(resultP);
         
         if (consumed) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                 xmlrpc_env env = [[Global sharedInstance] getXMLRPCEnv];
-                xmlrpc_client_call(&env, "http://localhost:8081/RPC2", "CONSUME-KEY-SEQUENCE", "(i)", (xmlrpc_int) 1);
+                xmlrpc_client_call(&env, "http://localhost:8081/RPC2", "CONSUME-KEY-SEQUENCE",
+                                   "(s)",
+                                   [sendingWindowId UTF8String]);
             });
         } else {
             [super sendEvent:event];

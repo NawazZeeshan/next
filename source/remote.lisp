@@ -190,17 +190,12 @@
     (when (equal 0 (length (alexandria:hash-table-values windows)))
       (uiop:quit))))
 
-(defun window-did-focus (window-id)
-  (let ((window (gethash window-id (windows *interface*))))
-    (setf (active-window *interface*) window)))
-
 (import 'buffer-did-commit-navigation :s-xml-rpc-exports)
-(import 'push-key-chord :s-xml-rpc-exports)
+(import 'push-key-event :s-xml-rpc-exports)
 (import 'consume-key-sequence :s-xml-rpc-exports)
 (import 'buffer-javascript-call-back :s-xml-rpc-exports)
 (import 'minibuffer-javascript-call-back :s-xml-rpc-exports)
 (import 'window-will-close :s-xml-rpc-exports)
-(import 'window-did-focus :s-xml-rpc-exports)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Convenience methods and functions for Users of the API ;;

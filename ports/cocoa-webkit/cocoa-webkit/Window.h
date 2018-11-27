@@ -12,7 +12,7 @@
 @property (strong, atomic, readwrite) Base *base;
 @property (strong, atomic, readwrite) NSString *identifier;
 
-- (id) initWithIdentifier:(NSString *) identifier;
+- (id) init;
 
 @end
 

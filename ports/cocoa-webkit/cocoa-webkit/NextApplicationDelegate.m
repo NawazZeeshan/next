@@ -30,7 +30,8 @@
 
 - (NSString *)windowMake
 {
-    Window *window = [[Window alloc] initWithIdentifier:[[self windows] nextAvailableKey]];
+    Window *window = [[Window alloc] init];
+    [window setIdentifier: [[self windows] insertElement:window]];
     [[[window base] minibuffer] setParentWindowIdentifier: [window identifier]];
     return [window identifier];
 }
